@@ -26,6 +26,7 @@ public class ElectricEngineUpgrade extends EngineUpgrade {
 
     public ElectricEngineUpgrade(PlaneEntity planeEntity) {
         super(SimplePlanesUpgrades.ELECTRIC_ENGINE.get(), planeEntity);
+        energyStorage.setOnChange(this::updateClient);
     }
 
     @Override
