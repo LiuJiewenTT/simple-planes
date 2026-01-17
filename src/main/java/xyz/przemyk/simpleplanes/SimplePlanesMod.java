@@ -1,6 +1,7 @@
 package xyz.przemyk.simpleplanes;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -10,6 +11,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import xyz.przemyk.simpleplanes.compat.ironchest.IronChestsCompat;
 import xyz.przemyk.simpleplanes.compat.quark.QuarkCompat;
+import xyz.przemyk.simpleplanes.entities.PlaneEntity;
 import xyz.przemyk.simpleplanes.network.SimplePlanesNetworking;
 import xyz.przemyk.simpleplanes.setup.*;
 
@@ -82,33 +84,35 @@ public class SimplePlanesMod {
 
     private void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
-            Capabilities.EnergyStorage.BLOCK,
-            SimplePlanesBlocks.CHARGING_STATION_TILE.get(),
-            (blockEntity, side) -> blockEntity.energyStorage
+                Capabilities.EnergyStorage.BLOCK,
+                SimplePlanesBlocks.CHARGING_STATION_TILE.get(),
+                (blockEntity, side) -> blockEntity.energyStorage
         );
 
         event.registerBlockEntity(
-            Capabilities.ItemHandler.BLOCK,
-            SimplePlanesBlocks.PLANE_WORKBENCH_TILE.get(),
-            (blockEntity, side) -> blockEntity.itemStackHandler
+                Capabilities.ItemHandler.BLOCK,
+                SimplePlanesBlocks.PLANE_WORKBENCH_TILE.get(),
+                (blockEntity, side) -> blockEntity.itemStackHandler
         );
 
-        event.registerEntity(
-            Capabilities.ItemHandler.ENTITY,
-            SimplePlanesEntities.PLANE.get(),
-            (entity, ctx) -> entity.getCap(Capabilities.ItemHandler.ENTITY)
-        );
+        registerPlaneEntityCaps(event, SimplePlanesEntities.PLANE.get());
+        registerPlaneEntityCaps(event, SimplePlanesEntities.LARGE_PLANE.get());
+        registerPlaneEntityCaps(event, SimplePlanesEntities.CARGO_PLANE.get());
+        registerPlaneEntityCaps(event, SimplePlanesEntities.HELICOPTER.get());
+    }
 
-        event.registerEntity(
-            Capabilities.FluidHandler.ENTITY,
-            SimplePlanesEntities.PLANE.get(),
-            (entity, ctx) -> entity.getCap(Capabilities.FluidHandler.ENTITY)
+    private static <T extends PlaneEntity> void registerPlaneEntityCaps(
+            RegisterCapabilitiesEvent event,
+            EntityType<T> type
+    ) {
+        event.registerEntity(Capabilities.ItemHandler.ENTITY, type,
+                (entity, ctx) -> entity.getCap(Capabilities.ItemHandler.ENTITY)
         );
-
-        event.registerEntity(
-            Capabilities.EnergyStorage.ENTITY,
-            SimplePlanesEntities.PLANE.get(),
-            (entity, ctx) -> entity.getCap(Capabilities.EnergyStorage.ENTITY)
+        event.registerEntity(Capabilities.FluidHandler.ENTITY, type,
+                (entity, ctx) -> entity.getCap(Capabilities.FluidHandler.ENTITY)
+        );
+        event.registerEntity(Capabilities.EnergyStorage.ENTITY, type,
+                (entity, ctx) -> entity.getCap(Capabilities.EnergyStorage.ENTITY)
         );
     }
 }
